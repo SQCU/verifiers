@@ -1,5 +1,14 @@
 # Verifiers: Reinforcement Learning with LLMs in Verifiable Environments
 
+### Fork notes!
+there are a collection of shell scripts about the root directory! they probably do things.
+
+math_train_qw3_0.6b.py has very peculiar results that demand further study;
+
+particularly, it is revealed that tool-calling is far more easily learned through the suggested training template... than use of the answer output formats needed for score-based verification! this is a surprising or perhaps even stunning result, and suggests further development of continuous, soft, overlapping, or curriculum verifiers in further experiments.
+
+### End fork notes!
+
 This repository contains a set of tools for reinforcement learning with LLMs in verifiable environments.
 
 **WARNING:** This repository in its current state should be viewed as **in-progress research code**, and is not guaranteed to yield stable or optimal training results. Best results will likely be found on reasonable timescales when using 7B+ models, and at least 8 GPUs.
