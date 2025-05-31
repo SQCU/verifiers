@@ -5,7 +5,7 @@ there are a collection of shell scripts about the root directory! they probably 
 
 math_train_qw3_0.6b.py has very peculiar results that demand further study;
 
-particularly, it is revealed that tool-calling is far more easily learned through the suggested training template... than use of the answer output formats needed for score-based verification! this is a surprising or perhaps even stunning result, and suggests further development of continuous, soft, overlapping, or curriculum verifiers in further experiments.
+particularly, it is revealed that tool-calling is far more easily learned through the suggested training template... than use of the answer output formats needed for math-correctness-score-based verification! this is a surprising or perhaps even stunning result, and suggests further development of continuous, soft, overlapping, or curriculum verifiers in further experiments.
 
 ### End fork notes!
 
