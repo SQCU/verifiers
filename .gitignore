@@ -6,7 +6,10 @@ env/
 .env.local
 uv.lock
 CLAUDE.md
+TRAINER_PLAN.md
+BATCH_SAMPLER.md
 .cursorrules
+.cursor/
 
 # artifacts
 dist/
@@ -34,5 +37,4 @@ verifiers/envs/textarena_env.py
 wip/
 old/
 tests/
-scripts/
 notebooks/
