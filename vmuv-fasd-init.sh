@@ -9,8 +9,8 @@ uv venv --seed --python 3.12
 
 ##vmuv-fasd-init.sh
 uv sync
-uv pip install flash-attn --no-build-isolation
 source .venv/bin/activate
-uv pip install -e .
+uv pip install flash-attn --no-build-isolation
+uv pip install -e ".[all]"
 ##because we are fundamentally using willccbb's starting point there's
 ##a plausibly preexisting+working pyproj?

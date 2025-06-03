@@ -172,6 +172,22 @@ def get_preprocess_fn(name: str) -> Callable[[Dict], Dict]:
                 "task": "code"
             }
         return preprocess_prime_code
+    elif name == "One-Shot-RLVR-Datasets":
+        def preprocess_one_shot(x: Dict[str, Any]) -> Dict[str, Any]:
+            def extract_dict_answer(dicty):
+                return dicty["ground_truth"]
+            def extract_chatformat_question(listy):
+                innerdicty = listy[0]
+                separ = "Let's think step by step " #😒
+                ques = innerdicty["content"].split(separ)[0]    #remove boxed format request
+                #it was this or writing a whole new parser/rubric (even more procrastinatory)
+                return ques
+            return {
+                "question": extract_chatformat_question(x["prompt"]),
+                "answer": extract_dict_answer(x["reward_model"]),
+                "task": "math"
+            }
+        return preprocess_one_shot
     else:
         raise ValueError(f"Dataset {name} not supported for preprocess_dataset.")
 
@@ -244,6 +260,10 @@ def load_example_dataset(name: str = "gsm8k",
             split = "train"
         dataset: Dataset = load_dataset("PrimeIntellect/verifiable-coding-problems")[split] # type: ignore
         dataset = dataset.filter(lambda x: x['prompt'].startswith("Solve the following coding problem using the programming language python:")) # type: ignore
+    elif name == "One-Shot-RLVR-Datasets":
+        if split is None:
+            split = "pi13"
+        dataset: Dataset = load_dataset("ypwang61/One-Shot-RLVR-Datasets")[split] # type: ignore
     else:
         raise ValueError(f"Dataset {name} not supported for preprocess_dataset. \
 Please ensure that the dataset is formatted with 'prompt' (str) and 'answer' (str) keys.")
