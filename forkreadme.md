@@ -5,7 +5,11 @@ tracking `fe8bd1d63862444f5bf9bcf338acc50a14ced6e9`
 
 many features are funky and different!
 
-crucially you call vllm inside of this project through `vf-vllm`, which blah blah blah `/verifiers/inference/vllm_server.py->cli_main():`. make sense? yeah, exactly. what this means for us is that the shell scripts we use should all be rewritten. 
+crucially you call vllm inside of this project through `vf-vllm`, which blah blah blah `/verifiers/inference/vllm_server.py->cli_main():`. make sense? yeah, exactly. what this means for us is that the shell scripts we use should all be rewritten.
+
+vf-vllm nameswaps, fortunately, are easy!
+as for `train.py`...
+`soft_math_train.py`.
 
 
 ### Fork notes!
