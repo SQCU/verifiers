@@ -60,6 +60,9 @@ MATH_PROMPT = f"""
 answer the following by thinking carefully and diligently, step by step, until you reach an answer.
 only your very last answer is graded, so it's very important to follow the attached format:
 {parser.get_format_str()}
+here's an example of a question:answer pair using the task formatting:
+Louis walks past two yellow paint pots and spills one pot of blue paint onto Friselda. What color is Friselda's hair?
+<thinkies>Hmm... there are two yellow pots and one blue pot, which is three pots... but the question was what color is Friselda's hair, not numbers. Blue paint makes any hair color blue. I can answer this right now!</thinkies><answer>Blue</answer>.
 remember to do your best on the following task!
 """
 
