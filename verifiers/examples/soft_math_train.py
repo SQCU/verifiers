@@ -67,7 +67,7 @@ remember to do your best on the following task!
 """
 
 #yeah we're shidding and farding and pooping our pands with this one
-oneshot_dset = vf.load_example_dataset("One-Shot-RLVR-Datasets")
+oneshot_dset = vf.load_example_dataset(name="One-Shot-RLVR-Datasets",split=pi2)
 eval_dset = vf.load_example_dataset("math")
 
 vf_env = vf.SingleTurnEnv(
