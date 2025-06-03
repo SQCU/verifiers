@@ -67,7 +67,7 @@ remember to do your best on the following task!
 """
 
 #yeah we're shidding and farding and pooping our pands with this one
-oneshot_dset = vf.load_example_dataset(name="One-Shot-RLVR-Datasets",split=pi2)
+oneshot_dset = vf.load_example_dataset(name="One-Shot-RLVR-Datasets",split='pi2')
 eval_dset = vf.load_example_dataset("math")
 
 vf_env = vf.SingleTurnEnv(
@@ -78,7 +78,7 @@ vf_env = vf.SingleTurnEnv(
 )
 
 model_name = "Qwen/Qwen3-0.6B-Base"
-run_name = "somath-" + model_name.split("/")[-1].lower()
+run_name = "somath-pi2-" + model_name.split("/")[-1].lower()
 
 from verifiers.trainers.grpo_config import GRPOConfig
 #uhh calibrated for 4xGPU node. good luck!
