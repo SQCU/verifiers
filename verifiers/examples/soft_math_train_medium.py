@@ -25,8 +25,8 @@ class SoftMathRubric(Rubric):
             from math_verify import parse, verify # type: ignore
             #response = self.parser.parse_answer(completion)
             fieldselection = self.parser.parse_answer_from_completion(completion, selection_field="answer")
-            if response is not None:
-                return 1.01 if verify(math_v_parse(answer), parse(response)) else 0.01 #so the thing is. wrong answers are ontologically different from typeerror exceptions.
+            if fieldselection is not None:
+                return 1.01 if verify(math_v_parse(answer), parse(fieldselection)) else 0.01 #so the thing is. wrong answers are ontologically different from typeerror exceptions.
             if self.logblast<12:
                 print(f"""None-typed parse without exception. is this because your parser is wack?
                 completion:{repr(completion)[:80]}

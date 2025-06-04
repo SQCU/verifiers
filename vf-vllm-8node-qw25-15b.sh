@@ -10,7 +10,7 @@ export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
 #try running on 6node
 CUDA_VISIBLE_DEVICES=0,1,2,3 vf-vllm \
 --model "Qwen/Qwen2.5-Math-1.5B" \
---tensor-parallel-size 2 --max-model-len 8192 \
---gpu-memory-utilization 0.9 --enable-prefix-caching \
+--tensor-parallel-size 2 --max-model-len 4096 \
+--gpu-memory-utilization 0.8 --enable-prefix-caching \
 --dtype bfloat16 \
 --host 0.0.0.0 --port 8000
