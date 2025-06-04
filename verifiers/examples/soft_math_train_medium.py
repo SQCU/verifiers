@@ -22,11 +22,16 @@ class SoftMathRubric(Rubric):
     def correct_answer_reward_func(self, completion, answer, **kwargs) -> float:
         """Reward function that checks if the final answer matches the expected answer."""
         try:
-            from math_verify import parse, verify # type: ignore
-            #response = self.parser.parse_answer(completion)
+            #from math_verify import parse, verify # type: ignore
+            #math_verify untrustworthy in multiprocessing context; signalerrors about timeouts.
             fieldselection = self.parser.parse_answer_from_completion(completion, selection_field="answer")
+            #low-dependency math_python.py 'verification'.
             if fieldselection is not None:
-                return 1.01 if verify(parse(answer), parse(fieldselection)) else 0.01 #so the thing is. wrong answers are ontologically different from typeerror exceptions.
+                if answer == fieldselection:
+                    return 1.01
+                else:
+                    return 0.01
+                #return 1.01 if verify(parse(answer), parse(fieldselection)) else 0.01 #so the thing is. wrong answers are ontologically different from typeerror exceptions.
             if self.logblast<12:
                 print(f"""None-typed parse without exception. is this because your parser is wack?
                 completion:{repr(completion)[:80]}
