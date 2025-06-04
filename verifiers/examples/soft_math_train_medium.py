@@ -91,7 +91,7 @@ vf_env = vf.SingleTurnEnv(
 
 #model_name = "Qwen/Qwen3-0.6B-Base"
 model_name = "Qwen/Qwen2.5-Math-1.5B"
-run_name = "somath-pi2-" + model_name.split("/")[-1].lower()
+run_name = "somath-II-pi2-" + model_name.split("/")[-1].lower()
 
 from verifiers.trainers.grpo_config import GRPOConfig
 #uhh calibrated for 4xGPU node. good luck!
