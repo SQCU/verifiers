@@ -60,15 +60,71 @@ class XMLParser(Parser):
                 pattern = rf"<{alt}>\s*(.*?)\s*</{alt}>"
                 match = re.search(pattern, text, re.DOTALL)
                 if match:
+                    #1 literal here denotes 'select first parenthesized subgroup'
+                    #this suggests `(.*?)` in regex above. sussy but maybe it works.
                     results[alt] = match.group(1).strip() if strip else match.group(1)
                 else:
                     results[alt] = None
         return SimpleNamespace(**results)
+        
+        def parse_dict(self, text: str, strip: bool = True) -> Any:
+        """
+        Parse the given XML string and return an object with attributes corresponding
+        to all allowed tags in the schema.
+        
+        For each field defined:
+          - If it is a simple field (e.g. 'reasoning'), the output object will have
+            an attribute 'reasoning' set to the text content (or None if missing).
+          - If it is defined with alternatives (e.g. ("code", "answer")), the output
+            object will have attributes for *each* allowed tag name. For example,
+            if the schema is ['reasoning', ('code', 'answer')], then both
+            `result.code` and `result.answer` are always accessible. If a tag is not
+            found in the XML, its corresponding attribute is set to None.
+        """
+        results: Dict[str, Optional[str]] = {}
+        for canonical, alternatives in self._fields:
+            # For each allowed alternative tag, search independently.
+            for alt in alternatives:
+                # Regex pattern to capture the content between the tags.
+                pattern = rf"<{alt}>\s*(.*?)\s*</{alt}>"
+                match = re.search(pattern, text, re.DOTALL)
+                if match:
+                    #1 literal here denotes 'select first parenthesized subgroup'
+                    #this suggests `(.*?)` in regex above. sussy but maybe it works.
+                    results[alt] = match.group(1).strip() if strip else match.group(1)
+                else:
+                    results[alt] = None
+        #return SimpleNamespace(**results)
+        return results
+
+    def parse_answer_from_completion(self, completion: List[Dict[str, str]] | str, selection_field=self.answer_field) -> str | None:
+        """Extract answer from a completion.
+            *output a string
+            *don't return a parse() call unmodified if that call is a dict not a string
+            *accept an actual operand for selection_field (defaulted for now)
+            *seriously try to return a string and i really mean it
+        """
+        if isinstance(completion, str):
+            return parse_answer_from_completion(self.parse_dict(completion))
+            #btw this is really buggy looking. just uh. think about it for a bit.
+            #recurse exactly once if the operand is a simple string (e.g. a raw llm out)
+        elif selection_field in completion.keys():
+            #yay it's already parsed! return the value of the 'answer' key :)
+            #this is very plausible in the single turn setting. i think.
+            return completion[selection_field]
+        elif 'role' in completion.keys():
+            #explicit role check is fine and matches the .get_assistant_messages source in parser.py
+            for msg in reversed(self.get_assistant_messages(completion)):
+                parsed = self.parse_dict(msg['content'])
+                if parsed and selection_field in parsed.keys():
+                    return parsed[selection_field]
+        return None
 
     def parse_answer(self, completion: List[Dict[str, str]] | str) -> str | None:
         """Extract the last answer from a completion."""
         if isinstance(completion, str):
             return self.parse(completion)
+            #btw this is really buggy looking. just uh. think about it for a bit.
         else:
             for msg in reversed(self.get_assistant_messages(completion)):
                 parsed = self.parse(msg['content'])

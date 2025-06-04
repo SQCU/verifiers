@@ -6,7 +6,7 @@ from verifiers import RewardFunc
 from verifiers.parsers import XMLParser
 from verifiers.rubrics import Rubric
 
-
+#upgrade mathrubric verifier?
 class SoftMathRubric(Rubric):
     def __init__(self,
                  funcs: List[RewardFunc] = [],
@@ -17,14 +17,26 @@ class SoftMathRubric(Rubric):
             self.parser = XMLParser(fields=["thinkies", "answer"])
         self.add_reward_func(self.correct_answer_reward_func)
         self.add_reward_func(self.parser.get_format_reward_func(), weight=0.2)
+        self.logblast = 0
 
     def correct_answer_reward_func(self, completion, answer, **kwargs) -> float:
         """Reward function that checks if the final answer matches the expected answer."""
         try:
-            from math_verify import parse, verify # type: ignore
-            response = self.parser.parse_answer(completion)
-            return 1.01 if verify(parse(answer), parse(response)) else 0.01 #so the thing is. wrong answers are ontologically different from typeerror exceptions.
-        except Exception:
+            from math_verify import parse, verify as math_v_parse, math_v_verify # type: ignore
+            #response = self.parser.parse_answer(completion)
+            fieldselection = self.parser.parse_answer_from_completion(completion, selection_field="answer")
+            if response is not None:
+                return 1.01 if math_v_verify(math_v_parse(answer), math_v_parse(response)) else 0.01 #so the thing is. wrong answers are ontologically different from typeerror exceptions.
+            if logblast<12:
+                print(f"""None-typed parse without exception. is this because your parser is wack?
+                completion:{repr(completion)[:80]}
+                raw_parse:{repr(self.parser.parse(completion))[:80]}""")
+                logblast +=1
+            return 0.001 #you get a tiny reward for not triggering exceptions at least.
+        except Exception as excy:
+            #crucial debugging string below
+            print(f"slow down there cowboy you're yeehawing a solution you can't be rightly held to:{excy}")
+            raise excy
             return 0.0
 
 
