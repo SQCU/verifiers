@@ -31,7 +31,7 @@ class SoftMathRubric(Rubric):
                 print(f"""None-typed parse without exception. is this because your parser is wack?
                 completion:{repr(completion)[:80]}
                 raw_parse:{repr(self.parser.parse(completion))[:80]}""")
-                logblast +=1
+                self.logblast +=1
             return 0.001 #you get a tiny reward for not triggering exceptions at least.
         except Exception as excy:
             #crucial debugging string below
@@ -111,7 +111,7 @@ training_args=GRPOConfig(
     bf16=True,
     max_grad_norm=0.001,    #set to kalomaze levels
     num_iterations=2,
-    beta=0,    #suspicious
+    beta=0.001,    #suspicious
     epsilon=0.2,    #clipping value used in PPO algorithm!
     epsilon_high=0.28,  #dapo paper
     max_prompt_length=1024,
