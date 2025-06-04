@@ -8,10 +8,10 @@ uv python install 3.12
 uv venv --seed --python 3.12
 
 ##vmuv-fasd-init.sh
+#uv pip install math-verify[antlr4_13_2]
 uv sync
 source .venv/bin/activate
 uv pip install flash-attn --no-build-isolation
 uv pip install -e ".[all]"
-uv add math-verify
 ##because we are fundamentally using willccbb's starting point there's
 ##a plausibly preexisting+working pyproj?

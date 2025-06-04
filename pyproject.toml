@@ -22,7 +22,6 @@ dependencies = [
     "openai>=1.81.0",
     "datasets>=3.6.0",
     "transformers",
-    "math-verify"
 ]
 
 [project.optional-dependencies]
@@ -33,6 +32,7 @@ all = [
     "brave-search",
     "reasoning-gym",
     "smolagents>=1.15.0",
+    "math-verify",
 ]
 
 [project.scripts]

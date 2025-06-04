@@ -112,11 +112,12 @@ class XMLParser(Parser):
             return parse_answer_from_completion(self.parse_dict(completion))
             #btw this is really buggy looking. just uh. think about it for a bit.
             #recurse exactly once if the operand is a simple string (e.g. a raw llm out)
-        elif selection_field in completion.keys():
-            #yay it's already parsed! return the value of the 'answer' key :)
-            #this is very plausible in the single turn setting. i think.
-            return completion[selection_field]
-        elif 'role' in completion.keys():
+        #elif selection_field in completion.keys():
+        #    #yay it's already parsed! return the value of the 'answer' key :)
+        #    #this is very plausible in the single turn setting. i think.
+        #    return completion[selection_field]
+        #elif 'role' in completion.keys():
+        else:
             #explicit role check is fine and matches the .get_assistant_messages source in parser.py
             for msg in reversed(self.get_assistant_messages(completion)):
                 parsed = self.parse_dict(msg['content'])
