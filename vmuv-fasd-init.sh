@@ -12,5 +12,6 @@ uv sync
 source .venv/bin/activate
 uv pip install flash-attn --no-build-isolation
 uv pip install -e ".[all]"
+uv add math-verify
 ##because we are fundamentally using willccbb's starting point there's
 ##a plausibly preexisting+working pyproj?
