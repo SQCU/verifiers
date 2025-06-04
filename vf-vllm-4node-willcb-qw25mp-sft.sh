@@ -5,7 +5,7 @@ export OPENAI_API_KEY=FRICK0AWAY0AND0BEGONE
 export WANDB_DISABLED=true
 export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
 
-CUDA_VISIBLE_DEVICES=0,1 python vf-vllm --model "willcb/Qwen2.5-7B-Math-Python-SFT" \
+CUDA_VISIBLE_DEVICES=0,1 vf-vllm --model "willcb/Qwen2.5-7B-Math-Python-SFT" \
     --tensor-parallel-size 4 --max-model-len 8192 --dtype bfloat16 \
     --gpu-memory-utilization 0.9 --enable-prefix-caching True \
     --host 0.0.0.0 --port 8000
