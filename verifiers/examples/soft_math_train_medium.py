@@ -22,21 +22,23 @@ class SoftMathRubric(Rubric):
     def correct_answer_reward_func(self, completion, answer, **kwargs) -> float:
         """Reward function that checks if the final answer matches the expected answer."""
         try:
-            from math_verify import parse, verify as math_v_parse, math_v_verify # type: ignore
+            from math_verify import parse, verify # type: ignore
             #response = self.parser.parse_answer(completion)
             fieldselection = self.parser.parse_answer_from_completion(completion, selection_field="answer")
             if response is not None:
-                return 1.01 if math_v_verify(math_v_parse(answer), math_v_parse(response)) else 0.01 #so the thing is. wrong answers are ontologically different from typeerror exceptions.
-            if logblast<12:
+                return 1.01 if verify(math_v_parse(answer), parse(response)) else 0.01 #so the thing is. wrong answers are ontologically different from typeerror exceptions.
+            if self.logblast<12:
                 print(f"""None-typed parse without exception. is this because your parser is wack?
                 completion:{repr(completion)[:80]}
                 raw_parse:{repr(self.parser.parse(completion))[:80]}""")
-                logblast +=1
+                self.logblast +=1
             return 0.001 #you get a tiny reward for not triggering exceptions at least.
         except Exception as excy:
             #crucial debugging string below
-            print(f"slow down there cowboy you're yeehawing a solution you can't be rightly held to:{excy}")
-            raise excy
+            if self.logblast<12:
+                print(f"slow down there cowboy you're yeehawing a solution you can't be rightly held to:{excy}")
+                self.logblast +=1
+                raise excy
             return 0.0
 
 

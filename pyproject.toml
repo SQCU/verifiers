@@ -22,6 +22,7 @@ dependencies = [
     "openai>=1.81.0",
     "datasets>=3.6.0",
     "transformers",
+    "math-verify"
 ]
 
 [project.optional-dependencies]
