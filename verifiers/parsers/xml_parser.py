@@ -67,7 +67,7 @@ class XMLParser(Parser):
                     results[alt] = None
         return SimpleNamespace(**results)
         
-        def parse_dict(self, text: str, strip: bool = True) -> Any:
+    def parse_dict(self, text: str, strip: bool = True) -> Any:
         """
         Parse the given XML string and return an object with attributes corresponding
         to all allowed tags in the schema.
