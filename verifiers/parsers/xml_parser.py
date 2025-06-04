@@ -97,13 +97,17 @@ class XMLParser(Parser):
         #return SimpleNamespace(**results)
         return results
 
-    def parse_answer_from_completion(self, completion: List[Dict[str, str]] | str, selection_field=self.answer_field) -> str | None:
+    def parse_answer_from_completion(self, completion: List[Dict[str, str]] | str, selection_field=None) -> str | None:
         """Extract answer from a completion.
             *output a string
             *don't return a parse() call unmodified if that call is a dict not a string
             *accept an actual operand for selection_field (defaulted for now)
             *seriously try to return a string and i really mean it
         """
+        if selection_field is None:
+            selection_field=self.answer_field
+            #blah blah errors about 'self' not defined at import time.
+            #hey anyone else notice that classes totally suck and make for the worst code?
         if isinstance(completion, str):
             return parse_answer_from_completion(self.parse_dict(completion))
             #btw this is really buggy looking. just uh. think about it for a bit.
