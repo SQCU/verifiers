@@ -2,7 +2,7 @@
 ##vf-math-python-4node.sh
 source .venv/bin/activate
 export OPENAI_API_KEY=FRICK0AWAY0AND0BEGONE
-export WANDB_DISABLED=true
+#export WANDB_DISABLED=true
 #export WANDB_OFFLINE=true
 #...
 
