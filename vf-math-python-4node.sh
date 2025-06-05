@@ -4,6 +4,7 @@ source .venv/bin/activate
 export OPENAI_API_KEY=FRICK0AWAY0AND0BEGONE
 #export WANDB_DISABLED=true
 #export WANDB_OFFLINE=true
+export WANDB_SILENT=true
 #...
 
 #CUDA_VISIBLE_DEVICES=0,1,2,3 python verifiers/inference/vllm_serve.py --model "willcb/Qwen2.5-7B-Math-Python-SFT" \
