@@ -48,7 +48,7 @@ rubric = vf.Rubric(
 weights=[1.0])
 vf_env = vf.SingleTurnEnv(
 	dataset=oneshot_dset, # hf Dataset with 'question' + 'answer' columns
-	system_prompt=TOOL_PROMPT,
+	system_prompt=VERIFY_PROMPT,
 	rubric
 )
 
