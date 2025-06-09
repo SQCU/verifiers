@@ -13,6 +13,10 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python verifiers/inference/vllm_serve.py --model 'Q
 CUDA_VISIBLE_DEVICES=3,4 accelerate launch --config-file configs/zero3.yaml verifiers/examples/math_train_4.py
 """
 
+#dataset = load_example_dataset("math", split="train")
+oneshot_dset = vf.load_example_dataset(name="One-Shot-RLVR-Datasets",split='pi2')
+
+parser = vf.XMLParser(['thinkies', 'answer'], answer_field='answer')
 VERIFY_PROMPT = f"""
 answer the following by thinking carefully and diligently, step by step, until you reach an answer.
 only your very first submitted answer is graded, so it's very important to follow the attached format:
@@ -27,29 +31,21 @@ Louis walks past two yellow paint pots and spills one pot of blue paint onto Fri
 remember to do your best on the following task!
 """
 
-#dataset = load_example_dataset("math", split="train")
-oneshot_dset = vf.load_example_dataset(name="One-Shot-RLVR-Datasets",split='pi2')
-
-parser = vf.XMLParser(['thinkies', 'answer'], answer_field='answer')
-system_prompt = f"""Reverse the given text.
-
-Respond in the following format:
-{parser.get_format_str()}"""
-
 def correct_answer_reward_func(completion, answer, **kwargs) -> float:
     """Reward function that checks if the final answer matches the expected answer."""
-    response = str(self.parser.parse_answer(completion))
+    response = str(parser.parse_answer(completion))
     reward = 1.0 if answer == response else 0.0
     return reward
 
 rubric = vf.Rubric(
-	correct_answer_reward_func, # def func(prompt, completion, answer, **kwargs)
+	[correct_answer_reward_func], # def func(prompt, completion, answer, **kwargs)
 	#parser.get_format_reward_func(),
-weights=[1.0])
+    weights=[1.0],
+    parser=parser)
 vf_env = vf.SingleTurnEnv(
 	dataset=oneshot_dset, # hf Dataset with 'question' + 'answer' columns
 	system_prompt=VERIFY_PROMPT,
-	rubric
+	rubric=rubric,
 )
 
 print(f"task system prompt:\n{vf_env.system_prompt}")
