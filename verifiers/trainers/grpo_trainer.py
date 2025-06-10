@@ -193,6 +193,8 @@ class GRPOTrainer(Trainer):
         self._step = 0
         self._buffered_inputs: Optional[List[Dict[str, Optional[torch.Tensor]]]] = None
 
+        # aux loss parameters
+        self.entropy_loss_scale = args.entropy_loss_scale
         # Data 
         self.shuffle_dataset = args.shuffle_dataset 
         train_dataset = env.get_dataset()
@@ -807,6 +809,37 @@ class GRPOTrainer(Trainer):
         
         return advantages
 
+    def _get_per_token_entropies(self, model, input_ids, attention_mask, logits_to_keep, batch_size=None) -> torch.Tensor:
+        batch_size = batch_size or input_ids.size(0)  # Chunk inputs into smaller batches to reduce memory peak
+        all_entropies = []
+        for i in range(0, input_ids.size(0), batch_size):
+            input_ids_batch = input_ids[i : i + batch_size]
+            attention_mask_batch = attention_mask[i : i + batch_size]
+
+            # We add 1 to `logits_to_keep` because the last logits of the sequence is later excluded
+            logits = model(
+                input_ids=input_ids_batch, attention_mask=attention_mask_batch, logits_to_keep=logits_to_keep + 1
+            ).logits
+            logits = logits[:, :-1, :]  # (B, L-1, V), exclude the last logit: it corresponds to the next token pred
+            input_ids_batch = input_ids_batch[:, -logits_to_keep:]
+            # For transformers<=4.48, logits_to_keep argument isn't supported, so here we drop logits ourselves.
+            # See https://github.com/huggingface/trl/issues/2770
+            logits = logits[:, -logits_to_keep:]
+            # Divide logits by sampling temperature.
+            # See https://huggingface.co/blog/the_n_implementation_details_of_rlhf_with_ppo#policy-training-implementation-details
+            logits = logits / self.temperature
+            logps = selective_log_softmax(logits, input_ids_batch)  # compute logprobs for the input tokens
+            entropy = torch.logsumexp(logits, dim=-1) - torch.sum(logps * logits, dim=-1)
+            all_entropies.append(logps)
+        return torch.cat(all_entropies, dim=0)
+    
+    """
+    def entropy_from_logits(logits: torch.Tensor):
+        #Calculate entropy from logits.
+        pd = torch.nn.functional.softmax(logits, dim=-1)
+        entropy = torch.logsumexp(logits, dim=-1) - torch.sum(pd * logits, dim=-1)
+    return entropy
+    """
 
     def compute_loss(self,
                      model: PreTrainedModel,
@@ -860,6 +893,17 @@ class GRPOTrainer(Trainer):
             per_token_loss = per_token_loss + self.beta * per_token_kl
             mean_kl = (per_token_kl * completion_mask).sum() / completion_mask.sum()
             self._metrics[mode]["kl"].append(self.accelerator.gather_for_metrics(mean_kl).nanmean().item()) # type: ignore
+
+        # compute the per-token entropies of sequential elements in our rollouts
+        if self.entropy_loss_scale != 0.0:
+            #with torch.no_grad():
+            # diverges from KL aux loss reference case
+            pt_entropies = self._get_per_token_entropies(
+                self.model, input_ids, attention_mask, logits_to_keep
+            )
+            per_token_loss = per_token_loss+self.entropy_loss_scale*pt_entropies
+            mean_pte_loss = (self.entropy_loss_scale * pt_entropies * completion_mask).sum() / completion_mask.sum()
+            self._metrics[mode]["pte"].append(self.accelerator.gather_for_metrics(mean_pte_loss).nanmean().item())  #maybe works?
 
         if self.loss_type == "grpo":
             loss = ((per_token_loss * completion_mask).sum(-1) / completion_mask.sum(-1).clamp(min=1.0)).mean()

@@ -52,7 +52,7 @@ print(f"task system prompt:\n{vf_env.system_prompt}")
 
 model_name = "willcb/Qwen2.5-7B-Math-Python-SFT"
 model, tokenizer = vf.get_model_and_tokenizer(model_name)
-run_name = "math-grpo_" + model_name.split("/")[-1].lower()
+run_name = "oneshot-grpo_" + model_name.split("/")[-1].lower()
 
 training_args=vf.grpo_defaults(run_name=run_name)
 training_args.num_iterations=2

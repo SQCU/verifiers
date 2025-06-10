@@ -213,6 +213,13 @@ class GRPOConfig(TrainingArguments):
             "training speed, but may be numerically unstable for long training runs."
         },
     )
+    entropy_loss_scale: float = field(
+        default=0.0,
+        metadata={
+            "help": "'''entropy loss''' scale. If `0.0`, entropy loss is not calculated, "
+            "resulting in a totally normal training run. suggested default value: -0.001 (arxiv.org/abs/2504.20571)."
+        },
+    )
     num_iterations: int = field(
         default=1,
         metadata={"help": "Number of iterations per batch (denoted as μ in the algorithm)."},
