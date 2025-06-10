@@ -60,6 +60,7 @@ training_args.per_device_train_batch_size=8 # from 8
 training_args.num_generations=8
 training_args.gradient_accumulation_steps=2 # from 2
 training_args.entropy_loss_scale=-0.001 # from default of 0
+training_args.save_steps=100
 
 trainer = vf.GRPOTrainer(
     model=model,
