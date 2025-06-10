@@ -827,9 +827,15 @@ class GRPOTrainer(Trainer):
             logits = logits[:, -logits_to_keep:]
             # Divide logits by sampling temperature.
             # See https://huggingface.co/blog/the_n_implementation_details_of_rlhf_with_ppo#policy-training-implementation-details
-            logits = logits / self.temperature
-            logps = selective_log_softmax(logits, input_ids_batch)  # compute logprobs for the input tokens
-            entropy = torch.logsumexp(logits, dim=-1) - torch.sum(logps * logits, dim=-1)
+            
+            # Compute entropy: H = -sum(p * log(p)) = log(Z) - sum(p * logits)
+            # where Z = sum(exp(logits)) and p = exp(logits) / Z
+            log_probs = torch.log_softmax(logits, dim=-1)  # (B, L, V)
+            probs = torch.softmax(logits, dim=-1)  # (B, L, V)
+            entropy = -torch.sum(probs * log_probs, dim=-1)  # (B, L)
+            #logits = logits / self.temperature
+            #logps = selective_log_softmax(logits, input_ids_batch)  # compute logprobs for the input tokens
+            #entropy = torch.logsumexp(logits, dim=-1) - torch.sum(logps * logits, dim=-1)
             all_entropies.append(entropy)
         return torch.cat(all_entropies, dim=0)
     
