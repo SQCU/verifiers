@@ -830,16 +830,16 @@ class GRPOTrainer(Trainer):
             logits = logits / self.temperature
             logps = selective_log_softmax(logits, input_ids_batch)  # compute logprobs for the input tokens
             entropy = torch.logsumexp(logits, dim=-1) - torch.sum(logps * logits, dim=-1)
-            all_entropies.append(logps)
+            all_entropies.append(entropy)
         return torch.cat(all_entropies, dim=0)
     
-    """
+    
     def entropy_from_logits(logits: torch.Tensor):
         #Calculate entropy from logits.
         pd = torch.nn.functional.softmax(logits, dim=-1)
         entropy = torch.logsumexp(logits, dim=-1) - torch.sum(pd * logits, dim=-1)
-    return entropy
-    """
+        return entropy
+    
 
     def compute_loss(self,
                      model: PreTrainedModel,
